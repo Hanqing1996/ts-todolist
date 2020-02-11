@@ -1,29 +1,49 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <NewTodo @addTodo="show($event)"></NewTodo>
+    <TodoList :list.sync="list" @updateTodoList=updateTodoList($event)></TodoList>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+import { Component, Vue } from "vue-property-decorator";
+import NewTodo from "../src/components/NewTodo.vue";
+import TodoList from "../src/components/TodoList.vue";
+import Todo from "../src/models/Todo";
+
 
 @Component({
   components: {
-    HelloWorld,
-  },
+    TodoList,
+    NewTodo
+  }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  list: Array<Todo> = localStorage.getItem('list')?JSON.parse(<string>localStorage.getItem('list')):[];
+  show(name:string) {
+
+    let task:Todo={
+      name,
+      status:'todo'
+    }
+    this.list.push(task)
+  }
+  updateTodoList(item:Todo){
+    let targetName=item.name
+    this.list.forEach((task,index)=>{
+      if(task.name===targetName){
+         this.list[index].status=item.status
+      }
+    })
+  }
+}
 </script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>
